@@ -1,7 +1,10 @@
 pragma solidity ^0.8.0;
+import "./UserManagement.sol";
 
 contract PoolManagement{
-  address public operator;
+	UserManagement UM = new UserManagement();
+
+	address public operator;
 	Pool[] public pools;
 	uint256 lastPoolId;
 
@@ -20,7 +23,7 @@ contract PoolManagement{
 		uint256 poolActivePeriod;
 	}
 
-  event PoolCreated (uint256 poolID, string insuranceType, uint256 minPoolMembers, uint256 maxPoolMembers, uint256 minMembershipFee, uint256 maxClaimAmt, uint256 poolEnrolmentPeriod, uint256 poolActivePeriod);
+	event PoolCreated (uint256 poolID, string insuranceType, uint256 minPoolMembers, uint256 maxPoolMembers, uint256 minMembershipFee, uint256 maxClaimAmt, uint256 poolEnrolmentPeriod, uint256 poolActivePeriod);
 	event PoolIsActive(uint256 poolID, poolStatus);
 
     function createPool(string memory _insuranceType, uint256 _minPoolMembers, uint256 _maxPoolMembers, uint256 _minMembershipFee, uint256 _maxClaimAmt, uint256 _poolEnrolmentPeriod, uint256 _poolActivePeriod) public onlyOperator {
@@ -44,6 +47,13 @@ contract PoolManagement{
         emit PoolCreated(poolId, _insuranceType, _minPoolMembers, _maxPoolMembers, _minMembershipFee, _maxClaimAmt, _poolEnrolmentPeriod, _poolActivePeriod);
 		lastPoolId++;
     }
+	
+	function pmApplicationDecision(userId) private returns (string, bool, byte){
+		(userName, userStatus, userData) = UM.checkUserDetails(userId)
+		// Check if user has been suspended
+		require(userStatus == true, "User has been suspended") 
+		// Perform pool application review process (more advanced processes)
+	}
 	
 	function joinPool(uint poolID) public{
 		require(poolIsRecruiting==true, "Pool is not accepting new members");
